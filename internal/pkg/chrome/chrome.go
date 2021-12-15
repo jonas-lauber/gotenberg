@@ -54,6 +54,7 @@ func cmd(logger xlog.Logger, ignoreCertificateErrors bool) (*exec.Cmd, error) {
 		// See https://github.com/puppeteer/puppeteer/issues/661
 		// and https://github.com/puppeteer/puppeteer/issues/2410.
 		"--font-render-hinting=none",
+		"--user-agent='Chrome'",
 		"--remote-debugging-port=9222",
 		"--disable-gpu",
 		"--disable-translate",

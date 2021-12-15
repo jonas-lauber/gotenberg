@@ -2,17 +2,14 @@
 
 set -e
 
-GOLANG_VERSION="$1"
-TINI_VERSION="$2"
-DOCKER_REGISTRY="$3"
-VERSION="$4"
-DOCKER_USER="$5"
-DOCKER_PASSWORD="$6"
+export GOLANG_VERSION=1.14
+export TINI_VERSION=0.19.0
+export VERSION="6.4.4-Jonas"
 
-docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+DOCKER_REGISTRY=docker.lauber.pro
 
 VERSION="${VERSION//v}"
-SEMVER=( ${VERSION//./ } )   
+SEMVER=( ${VERSION//./ } )
 VERSION_LENGTH=${#SEMVER[@]}
 
 if [ $VERSION_LENGTH -ne 3 ]; then
@@ -20,16 +17,13 @@ if [ $VERSION_LENGTH -ne 3 ]; then
     exit 1
 fi
 
+# Needed on MacOsx
+eval $(docker-machine env default) > /dev/null 2>&1
+
 docker build \
     --build-arg VERSION=${VERSION} \
     --build-arg TINI_VERSION=${TINI_VERSION} \
     -t ${DOCKER_REGISTRY}/gotenberg:latest \
-    -t ${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]} \
-    -t ${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]}.${SEMVER[1]} \
-    -t ${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]} \
     -f build/package/Dockerfile .
 
-docker push "${DOCKER_REGISTRY}/gotenberg:latest"
-docker push "${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]}"
-docker push "${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]}.${SEMVER[1]}"
-docker push "${DOCKER_REGISTRY}/gotenberg:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]}"
+docker push ${DOCKER_REGISTRY}/gotenberg:latest
